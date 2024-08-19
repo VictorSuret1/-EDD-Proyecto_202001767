@@ -1,5 +1,5 @@
 #include "ListaUsuarios.cpp"
-
+Matrix matrizAmistades;
 int main() {
     ListaUsuarios listaUsuarios;
     int opcion;
@@ -9,7 +9,8 @@ int main() {
         std::cout << "1. Registrar Usuario\n";
         std::cout << "2. Iniciar Sesion\n";
         std::cout << "3. Eliminar Cuenta\n";
-        std::cout << "4. Salir\n";
+        std::cout << "4. Generar ast\n";
+        std::cout << "5. Salir\n";
         std::cout << "Seleccione una opcion: ";
         std::cin >> opcion;
 
@@ -46,14 +47,17 @@ int main() {
                 break;
 
             case 4:
-                std::cout << "Saliendo...\n";
+                matrizAmistades.create_dot();
                 break;
 
+            case 5:
+                std::cout << "Saliendo...\n";
+                break;
             default:
                 std::cout << "Opcion no valida.\n";
                 break;
         }
-    } while (opcion != 4);
+    } while (opcion != 5);
 
     return 0;
 }

@@ -1,0 +1,20 @@
+digraph G{
+  node[shape=box];
+  MTX[ label = "Matrix", style = filled, fillcolor = firebrick1, group = 0 ];
+  "cmarialopez@example.com" [label = "marialopez@example.com"  style = filled, fillcolor = bisque1, group = 1 ];
+  "ccarlosrodrigues@example.com" [label = "carlosrodrigues@example.com"  style = filled, fillcolor = bisque1, group = 2 ];
+  "rmarialopez@example.com" [label = "marialopez@example.com"  style = filled, fillcolor = bisque1, group = 0 ];
+  "rcarlosrodrigues@example.com" [label = "carlosrodrigues@example.com"  style = filled, fillcolor = bisque1, group = 0 ];
+  { rank = same; "MTX";"cmarialopez@example.com";"ccarlosrodrigues@example.com";};
+  { rank = same; "rmarialopez@example.com";"1985162916032";};
+  { rank = same; "rcarlosrodrigues@example.com";"1985162918912";};
+  "1985162916032" [label = "Amistad" group = 2];
+  "1985162918912" [label = "Amistad" group = 1];
+  "cmarialopez@example.com" -> "ccarlosrodrigues@example.com";
+  "MTX" -> "rmarialopez@example.com";
+  "rmarialopez@example.com" -> "rcarlosrodrigues@example.com";
+  "rmarialopez@example.com" -> "1985162916032";
+  "ccarlosrodrigues@example.com" -> "1985162916032";
+  "rcarlosrodrigues@example.com" -> "1985162918912";
+  "cmarialopez@example.com" -> "1985162918912";
+}

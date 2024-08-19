@@ -1,11 +1,10 @@
 #include "Estructs.cpp"
 #include <nlohmann/json.hpp>
 #include <fstream>
+#include "matrix/headers/matrix.h"
 
 using json = nlohmann::json;
-
-
-
+ extern Matrix matrizAmistades;
 
 class ListaUsuarios {
 private:
@@ -136,6 +135,11 @@ public:
 }
 
 
+
+
+
+
+
 void cargarSolicitudesDesdeJSON(const std::string& path) {
     std::ifstream archivo(path);
     if (!archivo.is_open()) {
@@ -190,84 +194,104 @@ void cargarSolicitudesDesdeJSON(const std::string& path) {
 
 
 
-    // Mostrar menú para el usuario que ha iniciado sesión
     void mostrarMenuUsuario(Usuario* usuario) {
-        int opcion;
-        do {
-            std::cout << "\n--- Menu de Usuario ---\n";
-            std::cout << "1. Ver Solicitudes de Amistad\n";
-            std::cout << "2. Enviar Solicitud de Amistad\n";
-            std::cout << "3. Cerrar Sesión\n";
-            std::cout << "Seleccione una opción: ";
-            std::cin >> opcion;
+    int opcion;
+    do {
+        std::cout << "\n--- Menu de Usuario ---\n";
+        std::cout << "1. Ver Solicitudes de Amistad\n";
+        std::cout << "2. Enviar Solicitud de Amistad\n";
+        std::cout << "3. Cerrar Sesión\n";
+        std::cout << "Seleccione una opción: ";
+        std::cin >> opcion;
 
-            switch (opcion) {
-                case 1:
-                    verSolicitudesAmistad(usuario);
-                    break;
+        switch (opcion) {
+            case 1:
+                verSolicitudesAmistad(usuario);
+                break;
 
-                case 2: {
-                    std::string correoReceptor;
-                    std::cout << "Ingrese el correo del usuario al que quiere enviar la solicitud: ";
-                    std::cin.ignore();
-                    std::getline(std::cin, correoReceptor);
-                    enviarSolicitudAmistad(usuario->correo, correoReceptor);
-                    break;
-                }
-                case 3:
-                    std::cout << "Cerrando sesión...\n";
-                    break;
-
-                default:
-                    std::cout << "Opción no válida.\n";
-                    break;
+            case 2: {
+                std::string correoReceptor;
+                std::cout << "Ingrese el correo del usuario al que quiere enviar la solicitud: ";
+                std::cin.ignore();
+                std::getline(std::cin, correoReceptor);
+                enviarSolicitudAmistad(usuario->correo, correoReceptor);
+                break;
             }
-        } while (opcion != 3);
+            case 3:
+                std::cout << "Cerrando sesión...\n";
+                break;
+
+            default:
+                std::cout << "Opción no válida.\n";
+                break;
+        }
+    } while (opcion != 3);
+}
+
+    // Ver las solicitudes de amistad recibidas y aceptar o rechazar alguna
+void verSolicitudesAmistad(Usuario* usuario) {
+    if (usuario->solicitudesRecibidas.empty()) {
+        std::cout << "No tienes solicitudes de amistad.\n";
+        return;
     }
 
-    // Ver las solicitudes de amistad recibidas y rechazar alguna
-    void verSolicitudesAmistad(Usuario* usuario) {
-        if (usuario->solicitudesRecibidas.empty()) {
-            std::cout << "No tienes solicitudes de amistad.\n";
-            return;
-        }
+    std::stack<Solicitud*> tempStack;
+    int index = 1;
+    std::cout << "Solicitudes de amistad recibidas:\n";
+    while (!usuario->solicitudesRecibidas.empty()) {
+        Solicitud* solicitud = usuario->solicitudesRecibidas.top();
+        usuario->solicitudesRecibidas.pop();
+        tempStack.push(solicitud);
+        std::cout << index << ". De: " << solicitud->emisor->nombres << " " << solicitud->emisor->apellidos
+                  << " (" << solicitud->emisor->correo << ")\n";
+        index++;
+    }
 
-        std::stack<Solicitud*> tempStack;
-        int index = 1;
-        std::cout << "Solicitudes de amistad recibidas:\n";
-        while (!usuario->solicitudesRecibidas.empty()) {
-            Solicitud* solicitud = usuario->solicitudesRecibidas.top();
-            usuario->solicitudesRecibidas.pop();
-            tempStack.push(solicitud);
-            std::cout << index << ". De: " << solicitud->emisor->nombres << " " << solicitud->emisor->apellidos
-                      << " (" << solicitud->emisor->correo << ")\n";
-            index++;
-        }
+    // Aceptar o rechazar solicitud seleccionada
+    int seleccion;
+    std::cout << "Ingrese el número de la solicitud que desea aceptar (o 0 para no aceptar ninguna): ";
+    std::cin >> seleccion;
 
-        // Rechazar solicitud seleccionada
-        int seleccion;
-        std::cout << "Ingrese el número de la solicitud que desea rechazar (o 0 para no rechazar ninguna): ";
-        std::cin >> seleccion;
-
-        if (seleccion > 0 && seleccion < index) {
-            for (int i = 1; i < seleccion; i++) {
-                usuario->solicitudesRecibidas.push(tempStack.top());
-                tempStack.pop();
-            }
-
-            Solicitud* solicitudARechazar = tempStack.top();
-            tempStack.pop();
-            eliminarSolicitudEnviada(solicitudARechazar->emisor, usuario);
-            delete solicitudARechazar;
-            std::cout << "Solicitud de amistad rechazada.\n";
-        }
-
-        // Volver a llenar la pila original con las solicitudes no rechazadas
-        while (!tempStack.empty()) {
+    if (seleccion > 0 && seleccion < index) {
+        for (int i = 1; i < seleccion; i++) {
             usuario->solicitudesRecibidas.push(tempStack.top());
             tempStack.pop();
         }
+
+        Solicitud* solicitudSeleccionada = tempStack.top();
+        tempStack.pop();
+
+        int opcion;
+        std::cout << "¿Qué desea hacer con la solicitud?\n";
+        std::cout << "1. Aceptar\n";
+        std::cout << "2. Rechazar\n";
+        std::cout << "Seleccione una opción: ";
+        std::cin >> opcion;
+
+        if (opcion == 1) {
+            // Aceptar la solicitud
+                   
+            eliminarSolicitudEnviada(solicitudSeleccionada->emisor, usuario);
+            matrizAmistades.insertarAmistad(solicitudSeleccionada->emisor->correo, usuario->correo);
+            
+            std::cout << "Solicitud de amistad aceptada.\n";
+        } else if (opcion == 2) {
+            // Rechazar la solicitud
+            eliminarSolicitudEnviada(solicitudSeleccionada->emisor, usuario);
+            delete solicitudSeleccionada;
+            std::cout << "Solicitud de amistad rechazada.\n";
+        } else {
+            std::cout << "Opción no válida. La solicitud no se ha procesado.\n";
+            usuario->solicitudesRecibidas.push(solicitudSeleccionada); // Reinsertar la solicitud si no se procesa
+        }
     }
+
+    // Volver a llenar la pila original con las solicitudes no procesadas
+    while (!tempStack.empty()) {
+        usuario->solicitudesRecibidas.push(tempStack.top());
+        tempStack.pop();
+    }
+}
 
 
     // Eliminar una solicitud de la lista de solicitudes enviadas
