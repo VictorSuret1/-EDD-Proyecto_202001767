@@ -1,0 +1,23 @@
+[
+    {
+        "nombres" : "Juan",
+        "apellidos" : "Perez",
+        "fecha_de_nacimiento" : "20/05/2000",
+        "correo": "juanPerez@example.com",
+        "contraseña" : "pass"
+    },
+    {
+        "nombres" : "Carlos",
+        "apellidos" : "Rodrigues",
+        "fecha_de_nacimiento" : "20/05/2000",
+        "correo": "carlosrodrigues@example.com",
+        "contraseña" : "pass2"
+    },
+    {
+        "nombres" : "Maria",
+        "apellidos" : "Lopez",
+        "fecha_de_nacimiento" : "20/05/2000",
+        "correo": "marialopez@example.com",
+        "contraseña" : "pass3"
+    }
+]

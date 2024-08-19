@@ -1,0 +1,13 @@
+[
+    {
+        "emisor": "marialopez@example.com",
+        "receptor": "carlosrodrigues@example.com",
+        "estado": "PENDIENTE"
+    },
+    {
+        "emisor": "juanPerez@example.com",
+        "receptor": "carlosrodrigues@example.com",
+        "estado": "PENDIENTE"
+    }
+
+]
