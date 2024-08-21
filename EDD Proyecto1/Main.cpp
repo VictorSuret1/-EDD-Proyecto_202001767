@@ -1,21 +1,37 @@
+
 #include "ListaUsuarios.cpp"
+
+
 Matrix matrizAmistades;
+ListaPublicaciones listaPubli;
+ListaCircularPublicaciones circu;
+
+
 int main() {
     ListaUsuarios listaUsuarios;
     int opcion;
     std::string nombres, apellidos, fechaNacimiento, correo, contrasena;
 
     do {
-        std::cout << "1. Registrar Usuario\n";
-        std::cout << "2. Iniciar Sesion\n";
-        std::cout << "3. Eliminar Cuenta\n";
-        std::cout << "4. Generar ast\n";
-        std::cout << "5. Salir\n";
-        std::cout << "Seleccione una opcion: ";
+        std::cout << "\n--- Menú Principal ---\n";
+        std::cout << "1. Iniciar sesión\n";
+        std::cout << "2. Registrarse\n";
+        std::cout << "3. Información\n";
+        std::cout << "4. Salir\n";
+        std::cout << "Seleccione una opción: ";
         std::cin >> opcion;
 
         switch (opcion) {
             case 1:
+                std::cout << "Ingrese correo: ";
+                std::cin.ignore();
+                std::getline(std::cin, correo);
+                std::cout << "Ingrese contraseña: ";
+                std::getline(std::cin, contrasena);
+                listaUsuarios.iniciarSesion(correo, contrasena);
+                break;
+
+            case 2:
                 std::cout << "Ingrese nombres: ";
                 std::cin.ignore();
                 std::getline(std::cin, nombres);
@@ -30,34 +46,19 @@ int main() {
                 listaUsuarios.registrarUsuario(nombres, apellidos, fechaNacimiento, correo, contrasena);
                 break;
 
-            case 2:
-                std::cout << "Ingrese correo: ";
-                std::cin.ignore();
-                std::getline(std::cin, correo);
-                std::cout << "Ingrese contraseña: ";
-                std::getline(std::cin, contrasena);
-                listaUsuarios.iniciarSesion(correo, contrasena);
-                break;
-
             case 3:
-                std::cout << "Ingrese correo: ";
-                std::cin.ignore();
-                std::getline(std::cin, correo);
-                listaUsuarios.eliminarUsuario(correo);
+                std::cout << "Información de la aplicación...\n";
+                // Aquí puedes agregar la información que desees mostrar.
                 break;
 
             case 4:
-                matrizAmistades.create_dot();
-                break;
-
-            case 5:
                 std::cout << "Saliendo...\n";
                 break;
             default:
                 std::cout << "Opcion no valida.\n";
                 break;
         }
-    } while (opcion != 5);
+    } while (opcion != 4);
 
     return 0;
 }

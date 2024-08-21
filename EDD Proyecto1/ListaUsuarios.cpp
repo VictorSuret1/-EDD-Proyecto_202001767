@@ -1,10 +1,15 @@
-#include "Estructs.cpp"
+
+
 #include <nlohmann/json.hpp>
 #include <fstream>
 #include "matrix/headers/matrix.h"
+#include "ListaPublicaciones.cpp"
+
 
 using json = nlohmann::json;
  extern Matrix matrizAmistades;
+ extern ListaPublicaciones listaPubli;
+ extern ListaCircularPublicaciones circu;
 
 class ListaUsuarios {
 private:
@@ -12,6 +17,35 @@ private:
 
 public:
     ListaUsuarios() : cabeza(nullptr) {}
+
+
+    void mostrarRelacionesDeAmistad(Matrix& matriz) {
+    ListNode* rowNode = matriz.getRowHeader()->head;
+
+    std::cout << "--- Relaciones de Amistad ---\n";
+    
+    // Recorremos cada fila de la matriz
+    while (rowNode != nullptr) {
+        std::string usuario1 = matriz.getNombrePorIndice(rowNode->position);
+        MatrixNode* currentMatrixNode = rowNode->access;
+
+        // Verificamos las relaciones de amistad para usuario1
+        while (currentMatrixNode != nullptr) {
+            std::string usuario2 = matriz.getNombrePorIndice(currentMatrixNode->col);
+
+            // Si existe un nodo en la matriz, usuario1 y usuario2 son amigos
+            std::cout << usuario1 << " es amigo de " << usuario2 << "\n";
+
+            currentMatrixNode = currentMatrixNode->right;
+        }
+
+        rowNode = rowNode->next;
+    }
+
+    std::cout << "--- Fin de las Relaciones de Amistad ---\n";
+}
+
+
 
     // Verificar si el correo ya está registrado
     bool correoExiste(const std::string& correo) {
@@ -75,17 +109,9 @@ public:
     bool iniciarSesion(const std::string& correo, const std::string& contrasena) {
         
     if (correo == "admin@gmail.com" && contrasena == "EDD2S2024") {
-        std::cout << "Inicio de sesión como administrador exitoso.\n";
-        std::string path;
-        std::string path2;
-        std::cout << "Ingrese el path del archivo JSON para la carga masiva: ";
-        std::cin.ignore();
-        std::getline(std::cin, path);
-        cargarUsuariosDesdeJSON("C:/Users/19724/OneDrive/Desktop/EDD Proyecto1/Users.Json");
-        std::cout << "Ingrese el path del archivo JSON para la carga masiva de solicitudes: ";
-        std::cin.ignore();
-        std::getline(std::cin, path2);
-        cargarSolicitudesDesdeJSON("C:/Users/19724/OneDrive/Desktop/EDD Proyecto1/Soli.Json");
+
+        mostrarMenuAdmin();
+        
         return true;
     }
 
@@ -134,11 +160,30 @@ public:
     std::cout << "Carga masiva completada.\n";
 }
 
+void cargarMasivaPublicaciones(const std::string& path) {
+    std::ifstream archivo(path);
+    if (!archivo.is_open()) {
+        std::cerr << "No se pudo abrir el archivo " << path << std::endl;
+        return;
+    }
 
+    nlohmann::json jsonData;
+    archivo >> jsonData;
 
+    for (const auto& item : jsonData) {
+        std::string correo = item["correo"];
+        std::string contenido = item["contendio"];
+        std::string fecha = item["fecha"];
+        std::string hora = item["hora"];
 
+            Publicacion* nuevaPublicacion = new Publicacion(correo, contenido);
+            nuevaPublicacion->fecha = fecha;
+            nuevaPublicacion->hora = hora;
+            listaPubli.agregarPublicacion(correo, contenido);
+            std::cout << "Publicación de " << correo << " cargada exitosamente." << std::endl;
 
-
+    }
+}
 
 void cargarSolicitudesDesdeJSON(const std::string& path) {
     std::ifstream archivo(path);
@@ -181,7 +226,7 @@ void cargarSolicitudesDesdeJSON(const std::string& path) {
 
                 std::cout << "Solicitud de amistad pendiente cargada: " << correoEmisor << " -> " << correoReceptor << "\n";
             } else if (estado == "ACEPTADA") {
-                // Dejamos pendiente la implementación del estado "ACEPTADA"
+                matrizAmistades.insertarAmistad(correoEmisor,correoReceptor);
                 std::cout << "Solicitud de amistad aceptada: " << correoEmisor << " -> " << correoReceptor << " (pendiente de implementación)\n";
             }
         } else {
@@ -192,24 +237,334 @@ void cargarSolicitudesDesdeJSON(const std::string& path) {
     std::cout << "Carga masiva de solicitudes completada.\n";
 }
 
+void graficarListaUsuarios(Usuario* cabeza) {
+    std::ofstream file("lista_usuarios.dot");
+    
+    if (!file.is_open()) {
+        std::cerr << "Error al abrir el archivo para escribir el grafo.\n";
+        return;
+    }
 
+    file << "digraph G {\n";
+    file << "    node [shape=record];\n";
+
+    Usuario* actual = cabeza;
+    int index = 0;
+
+    while (actual != nullptr) {
+        // Crear un identificador único para cada nodo basado en su posición en la lista
+        std::string nodeName = "node" + std::to_string(index);
+
+        // Escribir la información del nodo en el archivo
+        file << "    " << nodeName << " [label=\"{" 
+             << "Nombres: " << actual->nombres << " | "
+             << "Apellidos: " << actual->apellidos << " | "
+             << "Correo: " << actual->correo << " | "
+             << "Fecha de Nacimiento: " << actual->fechaNacimiento << " | "
+             << "Puntero siguiente: " << (actual->siguiente ? "node" + std::to_string(index + 1) : "nullptr")
+             << "}\"];\n";
+
+        // Si hay un siguiente nodo, crear la conexión
+        if (actual->siguiente != nullptr) {
+            file << "    " << nodeName << " -> " << "node" << (index + 1) << ";\n";
+        }
+
+        actual = actual->siguiente;
+        index++;
+    }
+
+    file << "}\n";
+    file.close();
+
+    std::cout << "Archivo DOT generado: lista_usuarios.dot\n";
+}
+
+void graficarListaPublicaciones(ListaPublicaciones& lista) {
+    std::ofstream archivo("grafoPublicaciones.dot");
+    
+    if (archivo.is_open()) {
+        archivo << "digraph G {" << std::endl;
+        archivo << "node [shape=record];" << std::endl;
+
+        Publicacion* actual = lista.cabeza;
+        int i = 0;
+
+        // Crear nodos y enlaces
+        while (actual != nullptr) {
+            archivo << "nodo" << i << " [label=\"{Correo: " << actual->correoUsuario 
+                    << " | Contenido: " << actual->contenido 
+                    << " | Fecha: " << actual->fecha 
+                    << " | Hora: " << actual->hora << "}\"];" << std::endl;
+
+            if (actual->siguiente != nullptr) {
+                archivo << "nodo" << i << " -> nodo" << i + 1 << " [dir=both];" << std::endl;
+            }
+
+            actual = actual->siguiente;
+            i++;
+        }
+
+        archivo << "}" << std::endl;
+        archivo.close();
+    } else {
+        std::cerr << "No se pudo abrir el archivo para escritura." << std::endl;
+    }
+
+    // Generar imagen con Graphviz
+    system("dot -Tpng grafoPublicaciones.dot -o grafoPublicaciones.png");
+}
+
+    void mostrarMenuAdmin(){
+        int opcion;
+        std::string path;
+        std::string use;
+        do {
+            std::cout << "\n--- Menu de Administrador ---\n";
+            std::cout << "1. Carga de Usuarios\n";
+            std::cout << "2. Carga de Relaciones\n";
+            std::cout << "3. Carga de Publicaciones\n";
+            std::cout << "4. Gestionar usuarios\n";
+            std::cout << "5. Reportes\n";
+            std::cout << "6. Salir\n";
+            std::cout << "Seleccione una opción: ";
+            std::cin >> opcion;
+
+            switch(opcion){
+                case 1:
+                    
+                    std::cout << "Ingrese el path del archivo JSON para la carga masiva: ";
+                    std::cin.ignore();
+                    std::getline(std::cin, path);
+                    cargarUsuariosDesdeJSON(path);
+                    break;
+                case 2:
+                    std::cout << "Ingrese el path del archivo JSON para la carga masiva: ";
+                    std::cin.ignore();
+                    std::getline(std::cin, path);
+                    cargarSolicitudesDesdeJSON(path);
+                    break;
+                case 3:
+                    std::cout << "Ingrese el path del archivo JSON para la carga masiva: ";
+                    std::cin.ignore();
+                    std::getline(std::cin, path);
+                    cargarMasivaPublicaciones(path);
+                    break;
+                case 4:
+                    mostrarRelacionesDeAmistad(matrizAmistades);
+                    std::cout << "Ingrese el usuario a eliminar: ";
+                    std:: cin.ignore();
+                    std::getline(std::cin, use);
+                    eliminarUsuario(use);
+
+                    break;
+                case 5:
+                    graficarListaUsuarios(cabeza);
+                    graficarListaPublicaciones(listaPubli);
+                    matrizAmistades.create_dot();
+                    graficarTopUsuarios(listaPubli,matrizAmistades,*this);
+                    break;
+                case 6:
+                    std::cout << "Cerrando sesión...\n";
+                    break;
+                default:
+                    break;
+            }
+        }while (opcion != 6);
+    }
+
+
+
+    void mostrarPerfilUsuario(Usuario* usuario) {
+    if (usuario == nullptr) {
+        std::cout << "No hay ningún usuario en sesión.\n";
+        return;
+    }
+
+    std::cout << "\n--- Perfil del Usuario ---\n";
+    std::cout << "Nombres: " << usuario->nombres << "\n";
+    std::cout << "Apellidos: " << usuario->apellidos << "\n";
+    std::cout << "Fecha de Nacimiento: " << usuario->fechaNacimiento << "\n";
+    std::cout << "Correo: " << usuario->correo << "\n";
+    std::cout << "--------------------------------\n";
+}
+
+
+void menuPublicaciones(ListaPublicaciones& lista, Usuario* usuario, Matrix& matrizAmistades) {
+    int opcion;
+    do {
+        std::cout << "1. Crear Publicación" << std::endl;
+        std::cout << "2. Ver Publicaciones" << std::endl;
+        std::cout << "3. Salir" << std::endl;
+        std::cin >> opcion;
+        std::cin.ignore(); 
+
+        if (opcion == 1) {
+            std::string contenido;
+            std::cout << "Escribe tu publicación: ";
+            std::getline(std::cin, contenido);
+            lista.agregarPublicacion(usuario->correo, contenido);
+        } else if (opcion == 2) {
+            
+            // Llamar a verPublicaciones para mostrar las publicaciones filtradas
+            verPublicaciones(usuario, lista, matrizAmistades);
+        }
+    } while (opcion != 3);
+}
+
+
+
+void filtrarPublicacionesParaUsuario(ListaPublicaciones& listaPublicaciones, Usuario* usuarioLogeado, ListaCircularPublicaciones& listaFiltrada, Matrix& matrizAmistades) {
+    Publicacion* actual = listaPublicaciones.getCabeza();
+
+    while (actual != nullptr) {
+        // Verificar si la publicación pertenece al usuario logeado o a un amigo
+        if (actual->correoUsuario == usuarioLogeado->correo || matrizAmistades.sonAmigos(usuarioLogeado->correo, actual->correoUsuario)) {
+            // Insertar la publicación en la lista circular doblemente enlazada
+            listaFiltrada.insertarPublicacion(actual);
+        }
+
+        actual = actual->siguiente;
+    }
+}
+
+void verPublicaciones(Usuario* usuarioLogeado, ListaPublicaciones& listaPublicaciones, Matrix& matrizAmistades) {
+    ListaCircularPublicaciones listaFiltrada;
+    
+    // Filtrar publicaciones permitidas para el usuario logeado en cada llamada
+    filtrarPublicacionesParaUsuario(listaPublicaciones, usuarioLogeado, listaFiltrada, matrizAmistades);
+
+    // Explorar las publicaciones filtradas
+    listaFiltrada.explorarPublicaciones();
+}
+
+
+std::unordered_map<std::string, int> contarPublicacionesPorUsuario(ListaPublicaciones& listaPublicaciones) {
+    std::unordered_map<std::string, int> conteo;
+
+    Publicacion* actual = listaPublicaciones.getCabeza();
+    while (actual != nullptr) {
+        conteo[actual->correoUsuario]++;
+        actual = actual->siguiente;
+    }
+
+    return conteo;
+}
+
+std::unordered_map<std::string, int> contarAmigosPorUsuario(Matrix& matrizAmistades, ListaUsuarios& listaUsuarios) {
+    std::unordered_map<std::string, int> conteo;
+
+    Usuario* actual = cabeza;
+    while (actual != nullptr) {
+        int numAmigos = 0;
+        MatrixNode* nodoAmistad = matrizAmistades.getRowHeader()->head->access;
+
+        while (nodoAmistad != nullptr) {
+            if (nodoAmistad->col == matrizAmistades.obtenerIndice(actual->correo)) {
+                numAmigos++;
+            }
+            nodoAmistad = nodoAmistad->right;
+        }
+
+        conteo[actual->correo] = numAmigos;
+        actual = actual->siguiente;
+    }
+
+    return conteo;
+}
+
+std::vector<std::pair<std::string, int>> obtenerTopUsuarios(const std::unordered_map<std::string, int>& conteo, bool ascendente = false) {
+    std::vector<std::pair<std::string, int>> usuarios(conteo.begin(), conteo.end());
+
+    if (ascendente) {
+        std::sort(usuarios.begin(), usuarios.end(), [](const auto& a, const auto& b) {
+            return a.second < b.second;
+        });
+    } else {
+        std::sort(usuarios.begin(), usuarios.end(), [](const auto& a, const auto& b) {
+            return a.second > b.second;
+        });
+    }
+
+    if (usuarios.size() > 5) {
+        usuarios.resize(5);
+    }
+
+    return usuarios;
+}
+
+void generarGraficoUsuarios(const std::vector<std::pair<std::string, int>>& usuarios, const std::string& nombreArchivo, const std::string& titulo) {
+    std::ofstream file(nombreArchivo + ".dot");
+
+    if (!file.is_open()) {
+        std::cerr << "Error al abrir el archivo para escribir el grafo.\n";
+        return;
+    }
+
+    file << "digraph G {\n";
+    file << "    label=\"" << titulo << "\";\n";
+    file << "    node [shape=box];\n";
+
+    for (const auto& [usuario, cantidad] : usuarios) {
+        file << "    \"" << usuario << "\" [label=\"" << usuario << "\\n" << cantidad << "\"];\n";
+    }
+
+    file << "}\n";
+    file.close();
+
+    std::cout << "Archivo DOT generado: " << nombreArchivo << ".dot\n";
+}
+
+void graficarTopUsuarios(ListaPublicaciones& listaPublicaciones, Matrix& matrizAmistades, ListaUsuarios& listaUsuarios) {
+    auto conteoPublicaciones = contarPublicacionesPorUsuario(listaPublicaciones);
+    auto conteoAmigos = contarAmigosPorUsuario(matrizAmistades, listaUsuarios);
+
+    auto top5Publicaciones = obtenerTopUsuarios(conteoPublicaciones);
+    auto top5MenosAmigos = obtenerTopUsuarios(conteoAmigos, true);
+
+    generarGraficoUsuarios(top5Publicaciones, "top5_publicaciones", "Top 5 Usuarios con Más Publicaciones");
+    generarGraficoUsuarios(top5MenosAmigos, "top5_menos_amigos", "Top 5 Usuarios con Menos Amigos");
+}
 
     void mostrarMenuUsuario(Usuario* usuario) {
     int opcion;
+    int opcion2;
     do {
         std::cout << "\n--- Menu de Usuario ---\n";
-        std::cout << "1. Ver Solicitudes de Amistad\n";
-        std::cout << "2. Enviar Solicitud de Amistad\n";
-        std::cout << "3. Cerrar Sesión\n";
+        std::cout << "1. Perfil\n";
+        std::cout << "2. Ver Solicitudes de Amistad\n";
+        std::cout << "3. Enviar Solicitud de Amistad\n";
+        std::cout << "4. Publicaciones\n";
+        std::cout << "5. Cerrar Sesión\n";
         std::cout << "Seleccione una opción: ";
         std::cin >> opcion;
 
         switch (opcion) {
             case 1:
+                std::cout << "1. ver perfil ";
+                std::cout << "2. eliminar cuenta ";
+                std::cin >> opcion;
+                switch(opcion){
+                    case 1 :
+                        mostrarPerfilUsuario(usuario);
+                        break;
+                    case 2:
+                        std::cout << "seguro de borrar cuenta?";
+                        std::cout << "1. si";
+                        std::cout << "2. no";
+                        std::cin >> opcion2;
+                        if(opcion2 == 1){
+                            eliminarUsuario(usuario->correo);
+                        }else{
+                            break;
+                        }
+                        
+                }
+                
+            case 2:
                 verSolicitudesAmistad(usuario);
                 break;
 
-            case 2: {
+            case 3: {
                 std::string correoReceptor;
                 std::cout << "Ingrese el correo del usuario al que quiere enviar la solicitud: ";
                 std::cin.ignore();
@@ -217,15 +572,22 @@ void cargarSolicitudesDesdeJSON(const std::string& path) {
                 enviarSolicitudAmistad(usuario->correo, correoReceptor);
                 break;
             }
-            case 3:
+            case 4:
+                std::cout << "Publicaciones \n";
+
+                
+                menuPublicaciones(listaPubli,usuario,matrizAmistades);
+
+                
+                break;
+            case 5:
                 std::cout << "Cerrando sesión...\n";
                 break;
-
             default:
                 std::cout << "Opción no válida.\n";
                 break;
         }
-    } while (opcion != 3);
+    } while (opcion != 5);
 }
 
     // Ver las solicitudes de amistad recibidas y aceptar o rechazar alguna
@@ -249,7 +611,7 @@ void verSolicitudesAmistad(Usuario* usuario) {
 
     // Aceptar o rechazar solicitud seleccionada
     int seleccion;
-    std::cout << "Ingrese el número de la solicitud que desea aceptar (o 0 para no aceptar ninguna): ";
+    std::cout << "Ingrese el número de la solicitud (0 para volver):  ";
     std::cin >> seleccion;
 
     if (seleccion > 0 && seleccion < index) {
@@ -402,9 +764,6 @@ void verSolicitudesAmistad(Usuario* usuario) {
             actual = actual->siguiente;
         }
     }
-
-
-
 
 
     // Destructor para limpiar la lista

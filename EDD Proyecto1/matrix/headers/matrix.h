@@ -9,7 +9,9 @@ private:
     std::unordered_map<std::string, int> nombreAIndice;
     int indiceActual = 1;
 
-    int obtenerIndice(const std::string& nombre);
+    
+
+    
 
     void move_lr_pointers(ListNode *rowNode, MatrixNode *newMatrixNode);
     bool moveAt_first_lr_pointers(ListNode *rowNode, MatrixNode *newMatrixNode);
@@ -27,6 +29,17 @@ private:
     void write_dot(const string &code);
     string obtenerNombrePorIndice(int indice);
 public:
+    int obtenerIndice(const std::string& correo);
+    bool sonAmigos(const std::string& correo1, const std::string& correo2);
+    SimpleList* getRowHeader() const {
+        return rowHeader;
+    }
+
+    std::string getNombrePorIndice(int indice) {
+        return obtenerNombrePorIndice(indice);
+    }
+    
+        
     Matrix();
     ~Matrix();
 

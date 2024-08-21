@@ -8,16 +8,16 @@ Matrix::Matrix() {
     colHeader = new SimpleList(1);
 }
 
-int Matrix::obtenerIndice(const std::string& nombre) {
-    if (nombreAIndice.find(nombre) == nombreAIndice.end()) {
-        nombreAIndice[nombre] = indiceActual++;
+int Matrix::obtenerIndice(const std::string& correo) {
+    if (nombreAIndice.find(correo) == nombreAIndice.end()) {
+        nombreAIndice[correo] = indiceActual++;
     }
-    return nombreAIndice[nombre];
+    return nombreAIndice[correo];
 }
 
-void Matrix::insertarAmistad(const std::string& nombre1, const std::string& nombre2) {
-    int col = obtenerIndice(nombre1);
-    int row = obtenerIndice(nombre2);
+void Matrix::insertarAmistad(const std::string& correo1, const std::string& correo2) {
+    int col = obtenerIndice(correo1);
+    int row = obtenerIndice(correo2);
 
     insert(col, row, "Amistad");
     insert(row, col, "Amistad");
@@ -263,6 +263,21 @@ string Matrix::get_address_memory(MatrixNode* node) {
     ostringstream oss;
     oss << reinterpret_cast<uintptr_t>(node);
     return oss.str();
+}
+
+bool Matrix::sonAmigos(const std::string& correo1, const std::string& correo2) {
+    int col = obtenerIndice(correo1);
+    int row = obtenerIndice(correo2);
+
+    MatrixNode* nodo = rowHeader->head->access;
+    while (nodo != nullptr) {
+        if (nodo->col == col && nodo->row == row) {
+            return true;
+        }
+        nodo = nodo->right;
+    }
+
+    return false;
 }
 
 string Matrix::obtenerNombrePorIndice(int indice) {
