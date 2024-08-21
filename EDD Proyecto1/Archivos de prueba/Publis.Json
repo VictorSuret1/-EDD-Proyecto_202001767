@@ -1,0 +1,86 @@
+[
+    {
+        "correo": "juanPerez@example.com",
+        "contendio": "EDD nosale ;(",
+        "fecha": "27/02/2024",
+        "hora": "10:00"
+    },
+    {
+        "correo": "juanPerez@example.com",
+        "contendio": "EDD si sale ÑD",
+        "fecha": "28/05/2024",
+        "hora": "10:00"
+    },
+    {
+        "correo": "juanPerez@example.com",
+        "contendio": "EDD si sale 2",
+        "fecha": "28/05/2024",
+        "hora": "10:00"
+    },
+    {
+        "correo": "juanPerez@example.com",
+        "contendio": "EDD si sale 3",
+        "fecha": "28/05/2024",
+        "hora": "10:00"
+    },
+    {
+        "correo": "carlosrodrigues@example.com",
+        "contendio": "EDD salio?",
+        "fecha": "29/05/2024",
+        "hora": "12:00"
+    },
+    {
+        "correo": "carlosrodrigues@example.com",
+        "contendio": "EDD salio? 2 ",
+        "fecha": "29/05/2024",
+        "hora": "12:00"
+    },
+    {
+        "correo": "marialopez@example.com",
+        "contendio": "publide marialopez",
+        "fecha": "29/05/2024",
+        "hora": "12:00"
+    },
+    {
+        "correo": "marialopez@example.com",
+        "contendio": "publide marialopez 2",
+        "fecha": "29/05/2024",
+        "hora": "12:00"
+    },
+    {
+        "correo": "elenagomez@example.com",
+        "contendio": "publide elena2",
+        "fecha": "29/05/2024",
+        "hora": "12:00"
+    },
+    {
+        "correo": "elenagomez@example.com",
+        "contendio": "publide elena1",
+        "fecha": "29/05/2024",
+        "hora": "12:00"
+    },
+    {
+        "correo": "migueltorres@example.com",
+        "contendio": "publide de miguel torres",
+        "fecha": "29/05/2024",
+        "hora": "12:00"
+    },
+    {
+        "correo": "migueltorres@example.com",
+        "contendio": "publide de miguel torres2",
+        "fecha": "29/05/2024",
+        "hora": "12:00"
+    },
+    {
+        "correo": "diegomorales@example.com",
+        "contendio": "publide de diego",
+        "fecha": "29/05/2024",
+        "hora": "12:00"
+    },
+    {
+        "correo": "paulacruz@example.com",
+        "contendio": "publide de paula",
+        "fecha": "29/05/2024",
+        "hora": "12:00"
+    }
+]

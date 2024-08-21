@@ -1,0 +1,102 @@
+[
+    {
+        "emisor": "marialopez@example.com",
+        "receptor": "carlosrodrigues@example.com",
+        "estado": "PENDIENTE"
+    },
+    {
+        "emisor": "juanPerez@example.com",
+        "receptor": "carlosrodrigues@example.com",
+        "estado": "ACEPTADA"
+    },
+    {
+        "emisor": "anamartinez@example.com",
+        "receptor": "elenagomez@example.com",
+        "estado": "PENDIENTE"
+    },
+    {
+        "emisor": "luisgarcia@example.com",
+        "receptor": "sofiaruiz@example.com",
+        "estado": "ACEPTADA"
+    },
+    {
+        "emisor": "robertofernandez@example.com",
+        "receptor": "migueltorres@example.com",
+        "estado": "PENDIENTE"
+    },
+    {
+        "emisor": "sofiaruiz@example.com",
+        "receptor": "lauradiaz@example.com",
+        "estado": "ACEPTADA"
+    },
+    {
+        "emisor": "migueltorres@example.com",
+        "receptor": "ricardosanchez@example.com",
+        "estado": "PENDIENTE"
+    },
+    {
+        "emisor": "lauradiaz@example.com",
+        "receptor": "isabelvega@example.com",
+        "estado": "ACEPTADA"
+    },
+    {
+        "emisor": "ricardosanchez@example.com",
+        "receptor": "diegomorales@example.com",
+        "estado": "PENDIENTE"
+    },
+    {
+        "emisor": "isabelvega@example.com",
+        "receptor": "paulacruz@example.com",
+        "estado": "ACEPTADA"
+    },
+    {
+        "emisor": "diegomorales@example.com",
+        "receptor": "andresnavarro@example.com",
+        "estado": "PENDIENTE"
+    },
+    {
+        "emisor": "paulacruz@example.com",
+        "receptor": "juanPerez@example.com",
+        "estado": "ACEPTADA"
+    },
+    {
+        "emisor": "andresnavarro@example.com",
+        "receptor": "anamartinez@example.com",
+        "estado": "PENDIENTE"
+    },
+    {
+        "emisor": "marialopez@example.com",
+        "receptor": "luisgarcia@example.com",
+        "estado": "ACEPTADA"
+    },
+    {
+        "emisor": "elenagomez@example.com",
+        "receptor": "sofiaruiz@example.com",
+        "estado": "PENDIENTE"
+    },
+    {
+        "emisor": "carlosrodrigues@example.com",
+        "receptor": "robertofernandez@example.com",
+        "estado": "ACEPTADA"
+    },
+    {
+        "emisor": "juanPerez@example.com",
+        "receptor": "migueltorres@example.com",
+        "estado": "PENDIENTE"
+    },
+    {
+        "emisor": "luisgarcia@example.com",
+        "receptor": "ricardosanchez@example.com",
+        "estado": "ACEPTADA"
+    },
+    {
+        "emisor": "anamartinez@example.com",
+        "receptor": "isabelvega@example.com",
+        "estado": "PENDIENTE"
+    },
+    {
+        "emisor": "migueltorres@example.com",
+        "receptor": "paulacruz@example.com",
+        "estado": "ACEPTADA"
+    }
+]

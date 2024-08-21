@@ -1,0 +1,107 @@
+[
+    {
+        "nombres" : "Juan",
+        "apellidos" : "Perez",
+        "fecha_de_nacimiento" : "20/05/2000",
+        "correo": "juanPerez@example.com",
+        "contraseña" : "pass"
+    },
+    {
+        "nombres" : "Carlos",
+        "apellidos" : "Rodrigues",
+        "fecha_de_nacimiento" : "15/08/1998",
+        "correo": "carlosrodrigues@example.com",
+        "contraseña" : "pass2"
+    },
+    {
+        "nombres" : "Maria",
+        "apellidos" : "Lopez",
+        "fecha_de_nacimiento" : "03/11/1995",
+        "correo": "marialopez@example.com",
+        "contraseña" : "pass3"
+    },
+    {
+        "nombres" : "Ana",
+        "apellidos" : "Martinez",
+        "fecha_de_nacimiento" : "23/09/1997",
+        "correo": "anamartinez@example.com",
+        "contraseña" : "pass4"
+    },
+    {
+        "nombres" : "Luis",
+        "apellidos" : "Garcia",
+        "fecha_de_nacimiento" : "12/06/2001",
+        "correo": "luisgarcia@example.com",
+        "contraseña" : "pass5"
+    },
+    {
+        "nombres" : "Elena",
+        "apellidos" : "Gomez",
+        "fecha_de_nacimiento" : "27/01/1999",
+        "correo": "elenagomez@example.com",
+        "contraseña" : "pass6"
+    },
+    {
+        "nombres" : "Roberto",
+        "apellidos" : "Fernandez",
+        "fecha_de_nacimiento" : "10/02/2000",
+        "correo": "robertofernandez@example.com",
+        "contraseña" : "pass7"
+    },
+    {
+        "nombres" : "Sofia",
+        "apellidos" : "Ruiz",
+        "fecha_de_nacimiento" : "30/03/1996",
+        "correo": "sofiaruiz@example.com",
+        "contraseña" : "pass8"
+    },
+    {
+        "nombres" : "Miguel",
+        "apellidos" : "Torres",
+        "fecha_de_nacimiento" : "11/07/2002",
+        "correo": "migueltorres@example.com",
+        "contraseña" : "pass9"
+    },
+    {
+        "nombres" : "Laura",
+        "apellidos" : "Diaz",
+        "fecha_de_nacimiento" : "24/12/1998",
+        "correo": "lauradiaz@example.com",
+        "contraseña" : "pass10"
+    },
+    {
+        "nombres" : "Ricardo",
+        "apellidos" : "Sanchez",
+        "fecha_de_nacimiento" : "18/05/1997",
+        "correo": "ricardosanchez@example.com",
+        "contraseña" : "pass11"
+    },
+    {
+        "nombres" : "Isabel",
+        "apellidos" : "Vega",
+        "fecha_de_nacimiento" : "14/02/1995",
+        "correo": "isabelvega@example.com",
+        "contraseña" : "pass12"
+    },
+    {
+        "nombres" : "Diego",
+        "apellidos" : "Morales",
+        "fecha_de_nacimiento" : "22/10/2000",
+        "correo": "diegomorales@example.com",
+        "contraseña" : "pass13"
+    },
+    {
+        "nombres" : "Paula",
+        "apellidos" : "Cruz",
+        "fecha_de_nacimiento" : "05/04/1996",
+        "correo": "paulacruz@example.com",
+        "contraseña" : "pass14"
+    },
+    {
+        "nombres" : "Andres",
+        "apellidos" : "Navarro",
+        "fecha_de_nacimiento" : "16/11/1999",
+        "correo": "andresnavarro@example.com",
+        "contraseña" : "pass15"
+    }
+]
