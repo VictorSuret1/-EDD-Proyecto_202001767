@@ -48,7 +48,9 @@ int main() {
 
             case 3:
                 std::cout << "Información de la aplicacion...\n";
-                // Aquí puedes agregar la información que desees mostrar.
+                std::cout << "VictorEduardo Franco Suret";
+                std::cout << "Carnet: 202001767";
+                std::cout << "Proyecto 1 de Estructura de datos Fase 1";
                 break;
 
             case 4:
