@@ -150,7 +150,6 @@ public:
             std::string correo = usuarioData["correo"];
             std::string contrasena = usuarioData["contraseña"];
 
-            // Registrar el usuario en la lista
             registrarUsuario(nombres, apellidos, fechaNacimiento, correo, contrasena);
         } else {
             std::cout << "Error: JSON malformado. Faltan campos requeridos para un usuario.\n";
@@ -185,7 +184,7 @@ void cargarMasivaPublicaciones(const std::string& path) {
     }
 }
 
-void cargarSolicitudesDesdeJSON(const std::string& path) {
+void cargarSolicitudesDesdeJSON(const std::string& path, Matrix& matrizAmistades) {
     std::ifstream archivo(path);
     if (!archivo.is_open()) {
         std::cout << "No se pudo abrir el archivo: " << path << "\n";
@@ -215,7 +214,7 @@ void cargarSolicitudesDesdeJSON(const std::string& path) {
 
             if (estado == "PENDIENTE") {
                 // Crear la solicitud y agregarla a la lista de solicitudes del receptor
-                Solicitud* nuevaSolicitud = new Solicitud{emisor, nullptr};
+                Solicitud* nuevaSolicitud = new Solicitud{emisor, correoReceptor};
 
                 // Agregar a la lista de solicitudes enviadas del emisor
                 nuevaSolicitud->siguiente = emisor->solicitudesEnviadas;
@@ -226,8 +225,8 @@ void cargarSolicitudesDesdeJSON(const std::string& path) {
 
                 std::cout << "Solicitud de amistad pendiente cargada: " << correoEmisor << " -> " << correoReceptor << "\n";
             } else if (estado == "ACEPTADA") {
-                matrizAmistades.insertarAmistad(correoEmisor,correoReceptor);
-                std::cout << "Solicitud de amistad aceptada: " << correoEmisor << " -> " << correoReceptor << " (pendiente de implementación)\n";
+                matrizAmistades.insertarAmistad(correoEmisor, correoReceptor);
+                std::cout << "Solicitud de amistad aceptada: " << correoEmisor << " -> " << correoReceptor << "\n";
             }
         } else {
             std::cout << "Error: JSON malformado. Faltan campos requeridos para una solicitud.\n";
@@ -236,6 +235,7 @@ void cargarSolicitudesDesdeJSON(const std::string& path) {
 
     std::cout << "Carga masiva de solicitudes completada.\n";
 }
+
 
 void graficarListaUsuarios(Usuario* cabeza) {
     std::ofstream file("lista_usuarios.dot");
@@ -280,7 +280,7 @@ void graficarListaUsuarios(Usuario* cabeza) {
 }
 
 void graficarListaPublicaciones(ListaPublicaciones& lista) {
-    std::ofstream archivo("grafoPublicaciones.dot");
+    std::ofstream archivo("lista_publicaciones.dot");
     
     if (archivo.is_open()) {
         archivo << "digraph G {" << std::endl;
@@ -309,9 +309,6 @@ void graficarListaPublicaciones(ListaPublicaciones& lista) {
     } else {
         std::cerr << "No se pudo abrir el archivo para escritura." << std::endl;
     }
-
-    // Generar imagen con Graphviz
-    system("dot -Tpng grafoPublicaciones.dot -o grafoPublicaciones.png");
 }
 
     void mostrarMenuAdmin(){
@@ -326,7 +323,7 @@ void graficarListaPublicaciones(ListaPublicaciones& lista) {
             std::cout << "4. Gestionar usuarios\n";
             std::cout << "5. Reportes\n";
             std::cout << "6. Salir\n";
-            std::cout << "Seleccione una opción: ";
+            std::cout << "Seleccione una opcion: ";
             std::cin >> opcion;
 
             switch(opcion){
@@ -341,7 +338,7 @@ void graficarListaPublicaciones(ListaPublicaciones& lista) {
                     std::cout << "Ingrese el path del archivo JSON para la carga masiva: ";
                     std::cin.ignore();
                     std::getline(std::cin, path);
-                    cargarSolicitudesDesdeJSON(path);
+                    cargarSolicitudesDesdeJSON(path,matrizAmistades);
                     break;
                 case 3:
                     std::cout << "Ingrese el path del archivo JSON para la carga masiva: ";
@@ -359,9 +356,14 @@ void graficarListaPublicaciones(ListaPublicaciones& lista) {
                     break;
                 case 5:
                     graficarListaUsuarios(cabeza);
+                    convertirDotAImagen("lista_usuarios.dot","lista_usuarios.png");
                     graficarListaPublicaciones(listaPubli);
+                    convertirDotAImagen("lista_publicaciones.dot","lista_publicaciones.png");
                     matrizAmistades.create_dot();
+                    convertirDotAImagen("graph.dot","graph.png");
                     graficarTopUsuarios(listaPubli,matrizAmistades,*this);
+                    convertirDotAImagen("top5_menos_amigos.dot","top5_menos_amigos.png");
+                    convertirDotAImagen("top5_publicaciones.dot","top5_publicaciones.png");
                     break;
                 case 6:
                     std::cout << "Cerrando sesión...\n";
@@ -389,10 +391,10 @@ void graficarListaPublicaciones(ListaPublicaciones& lista) {
 }
 
 
-void menuPublicaciones(ListaPublicaciones& lista, Usuario* usuario, Matrix& matrizAmistades) {
+void menuPublicaciones(Usuario* usuario, Matrix& matrizAmistades) {
     int opcion;
     do {
-        std::cout << "1. Crear Publicación" << std::endl;
+        std::cout << "1. Crear Publicacion" << std::endl;
         std::cout << "2. Ver Publicaciones" << std::endl;
         std::cout << "3. Salir" << std::endl;
         std::cin >> opcion;
@@ -400,13 +402,11 @@ void menuPublicaciones(ListaPublicaciones& lista, Usuario* usuario, Matrix& matr
 
         if (opcion == 1) {
             std::string contenido;
-            std::cout << "Escribe tu publicación: ";
+            std::cout << "Escribe tu publicacion: ";
             std::getline(std::cin, contenido);
-            lista.agregarPublicacion(usuario->correo, contenido);
+            listaPubli.agregarPublicacion(usuario->correo, contenido);
         } else if (opcion == 2) {
-            
-            // Llamar a verPublicaciones para mostrar las publicaciones filtradas
-            verPublicaciones(usuario, lista, matrizAmistades);
+            verPublicaciones(usuario, listaPubli, matrizAmistades);
         }
     } while (opcion != 3);
 }
@@ -435,6 +435,7 @@ void verPublicaciones(Usuario* usuarioLogeado, ListaPublicaciones& listaPublicac
 
     // Explorar las publicaciones filtradas
     listaFiltrada.explorarPublicaciones();
+    
 }
 
 
@@ -525,6 +526,214 @@ void graficarTopUsuarios(ListaPublicaciones& listaPublicaciones, Matrix& matrizA
     generarGraficoUsuarios(top5MenosAmigos, "top5_menos_amigos", "Top 5 Usuarios con Menos Amigos");
 }
 
+void graficarSolicitudes(Usuario* usuario) {
+    std::ofstream file("solicitudes_usuario.dot");
+
+    if (!file.is_open()) {
+        std::cerr << "Error al abrir el archivo para escribir el grafo.\n";
+        return;
+    }
+
+    file << "digraph G {\n";
+    file << "    node [shape=box];\n";
+
+    // Caja 1: Solicitudes Enviadas
+    file << "    subgraph cluster_enviadas {\n";
+    file << "        label=\"Solicitudes Enviadas\";\n";
+    file << "        style=filled;\n";
+    file << "        color=lightgrey;\n";
+    file << "        \"" << usuario->nombres << " " << usuario->apellidos << "_enviadas\" [label=\"" 
+         << usuario->nombres << " " << usuario->apellidos << "\", style=filled, fillcolor=lightblue];\n";
+
+    Solicitud* actualEnviada = usuario->solicitudesEnviadas;
+    while (actualEnviada != nullptr) {
+        file << "        \"" << usuario->nombres << " " << usuario->apellidos << "_enviadas\" -> \"" 
+             << actualEnviada->correoReceptor << "\" [label=\"Enviado\"];\n";
+        actualEnviada = actualEnviada->siguiente;
+    }
+    file << "    }\n";
+
+    // Caja 2: Solicitudes Recibidas
+    file << "    subgraph cluster_recibidas {\n";
+    file << "        label=\"Solicitudes Recibidas\";\n";
+    file << "        style=filled;\n";
+    file << "        color=lightblue;\n";
+    file << "        \"" << usuario->nombres << " " << usuario->apellidos << "_recibidas\" [label=\"" 
+         << usuario->nombres << " " << usuario->apellidos << "\", style=filled, fillcolor=lightblue];\n";
+
+    std::stack<Solicitud*> tempStack = usuario->solicitudesRecibidas;  
+    while (!tempStack.empty()) {
+        Solicitud* solicitudActual = tempStack.top();
+        tempStack.pop();
+        file << "        \"" << solicitudActual->emisor->nombres << " " << solicitudActual->emisor->apellidos 
+             << "\" -> \"" << usuario->nombres << " " << usuario->apellidos << "_recibidas\" [label=\"Recibido\"];\n";
+    }
+    
+    file << "    }\n";
+
+    file << "}\n";
+    file.close();
+
+    std::cout << "Archivo DOT generado: solicitudes_usuario.dot\n";
+}
+
+void graficarListaCircularPublicaciones(Usuario* usuarioLogeado, ListaPublicaciones& listaPublicaciones, Matrix& matrizAmistades) {
+    ListaCircularPublicaciones listaFiltrada;
+    filtrarPublicacionesParaUsuario(listaPublicaciones, usuarioLogeado, listaFiltrada, matrizAmistades);
+    
+    if (listaFiltrada.estaVacia()) {
+        std::cout << "No hay publicaciones para graficar.\n";
+        return;
+    }
+
+    std::ofstream file("lista_circular.dot");
+
+    if (!file.is_open()) {
+        std::cerr << "Error al abrir el archivo para escribir el grafo.\n";
+        return;
+    }
+
+    file << "digraph G {\n";
+    file << "    node [shape=box];\n";
+    file << "    label=\"Publicaciones de " << usuarioLogeado->nombres << "\";\n";
+
+    NodoPublicacion* actual = listaFiltrada.cabeza;
+    NodoPublicacion* inicio = actual;
+    int contador = 0;
+
+    do {
+        std::string nodoActual = "nodo" + std::to_string(contador);
+        file << "    " << nodoActual << " [label=\"" << actual->publicacion->contenido 
+             << "\\nFecha: " << actual->publicacion->fecha << "\\nHora: " << actual->publicacion->hora << "\"];\n";
+
+        if (actual->siguiente != inicio) {
+            std::string nodoSiguiente = "nodo" + std::to_string(contador + 1);
+            file << "    " << nodoActual << " -> " << nodoSiguiente << " [label=\"siguiente\"];\n";
+            file << "    " << nodoSiguiente << " -> " << nodoActual << " [label=\"anterior\"];\n";
+        } else {
+            // Conectar el último nodo con el primero para cerrar la lista circular
+            std::string nodoPrimero = "nodo0";
+            file << "    " << nodoActual << " -> " << nodoPrimero << " [label=\"siguiente\"];\n";
+            file << "    " << nodoPrimero << " -> " << nodoActual << " [label=\"anterior\"];\n";
+        }
+
+        actual = actual->siguiente;
+        contador++;
+    } while (actual != inicio);
+
+    file << "}\n";
+    file.close();
+
+    std::cout << "Archivo DOT generado: lista_circular_publicaciones.dot\n";
+}
+
+void graficaListaAmigos(Usuario* usuarioLogeado, Matrix& matrizAmistades) {
+    std::ofstream file("lista_amigos_usuarios.dot");
+
+    if (!file.is_open()) {
+        std::cerr << "Error al abrir el archivo para escribir el grafo.\n";
+        return;
+    }
+
+    file << "digraph G {\n";
+    file << "    node [shape=box];\n";
+    file << "    label=\"Amistades de " << usuarioLogeado->nombres << " " << usuarioLogeado->apellidos << "\";\n";
+
+    int userIndex = matrizAmistades.obtenerIndice(usuarioLogeado->correo);
+
+
+    ListNode* rowNode = matrizAmistades.rowHeader->head;
+    while (rowNode != nullptr) {
+        if (rowNode->position == userIndex) {
+            MatrixNode* current = rowNode->access;
+            while (current != nullptr) {
+                std::string friendEmail = matrizAmistades.obtenerNombrePorIndice(current->col);
+                file << "    \"" << usuarioLogeado->correo << "\" -> \"" << friendEmail << "\" [label=\"Amigo\"];\n";
+                current = current->right;
+            }
+            break; 
+        }
+        rowNode = rowNode->next;
+    }
+
+    file << "}\n";
+    file.close();
+
+    std::cout << "Archivo DOT generado: matriz_usuario_logeado.dot\n";
+}
+
+void graficarMatrizUsuarioLogeado(Usuario* usuarioLogeado, Matrix& matrizAmistades) {
+    std::ofstream file("matriz_usuario_logeado.dot");
+
+    if (!file.is_open()) {
+        std::cerr << "Error al abrir el archivo para escribir el grafo.\n";
+        return;
+    }
+
+    file << "digraph G {\n";
+    file << "    node [shape=box];\n";
+    file << "    rankdir=LR;\n";  // Para asegurar que la matriz se dibuje de izquierda a derecha
+    file << "    label=\"Amistades de " << usuarioLogeado->nombres << " " << usuarioLogeado->apellidos << "\";\n";
+
+    int userIndex = matrizAmistades.obtenerIndice(usuarioLogeado->correo);
+
+    // Agregar nodos de la columna y fila del usuario logeado
+    file << "    \"" << usuarioLogeado->correo << "\" [style=filled, fillcolor=lightblue, group=1];\n";
+
+    ListNode* colNode = matrizAmistades.colHeader->head;
+    while (colNode != nullptr) {
+        if (colNode->position == userIndex) {
+            MatrixNode* current = colNode->access;
+            while (current != nullptr) {
+                std::string friendEmail = matrizAmistades.obtenerNombrePorIndice(current->row);
+                file << "    \"" << friendEmail << "\" [style=filled, fillcolor=lightgrey, group=2];\n";
+                file << "    \"" << usuarioLogeado->correo << "\" -> \"" << friendEmail << "\" [label=\"Amigo\"];\n";
+                current = current->bottom;
+            }
+            break;
+        }
+        colNode = colNode->next;
+    }
+
+    ListNode* rowNode = matrizAmistades.rowHeader->head;
+    while (rowNode != nullptr) {
+        if (rowNode->position == userIndex) {
+            MatrixNode* current = rowNode->access;
+            while (current != nullptr) {
+                std::string friendEmail = matrizAmistades.obtenerNombrePorIndice(current->col);
+                file << "    \"" << friendEmail << "\" [style=filled, fillcolor=lightgrey, group=3];\n";
+                file << "    \"" << usuarioLogeado->correo << "\" -> \"" << friendEmail << "\" [label=\"Amigo\"];\n";
+                current = current->right;
+            }
+            break;
+        }
+        rowNode = rowNode->next;
+    }
+
+    // Enlazar los nodos de la fila y columna entre sí para formar la estructura de la matriz
+    file << "    { rank=same; ";
+    file << "\"" << usuarioLogeado->correo << "\"; ";
+    colNode = matrizAmistades.colHeader->head;
+    while (colNode != nullptr) {
+        if (colNode->position == userIndex) {
+            MatrixNode* current = colNode->access;
+            while (current != nullptr) {
+                std::string friendEmail = matrizAmistades.obtenerNombrePorIndice(current->row);
+                file << "\"" << friendEmail << "\"; ";
+                current = current->bottom;
+            }
+            break;
+        }
+        colNode = colNode->next;
+    }
+    file << "};\n";
+
+    file << "}\n";
+    file.close();
+
+    std::cout << "Archivo DOT generado: matriz_usuario_logeado.dot\n";
+}
+
     void mostrarMenuUsuario(Usuario* usuario) {
     int opcion;
     int opcion2;
@@ -534,16 +743,17 @@ void graficarTopUsuarios(ListaPublicaciones& listaPublicaciones, Matrix& matrizA
         std::cout << "2. Ver Solicitudes de Amistad\n";
         std::cout << "3. Enviar Solicitud de Amistad\n";
         std::cout << "4. Publicaciones\n";
-        std::cout << "5. Cerrar Sesión\n";
-        std::cout << "Seleccione una opción: ";
+        std::cout << "5. Reportes\n";
+        std::cout << "6. Cerrar Sesion\n";
+        std::cout << "Seleccione una opcion: ";
         std::cin >> opcion;
 
         switch (opcion) {
             case 1:
                 std::cout << "1. ver perfil ";
                 std::cout << "2. eliminar cuenta ";
-                std::cin >> opcion;
-                switch(opcion){
+                std::cin >> opcion2;
+                switch(opcion2){
                     case 1 :
                         mostrarPerfilUsuario(usuario);
                         break;
@@ -576,18 +786,40 @@ void graficarTopUsuarios(ListaPublicaciones& listaPublicaciones, Matrix& matrizA
                 std::cout << "Publicaciones \n";
 
                 
-                menuPublicaciones(listaPubli,usuario,matrizAmistades);
+                menuPublicaciones(usuario,matrizAmistades);
 
                 
                 break;
             case 5:
-                std::cout << "Cerrando sesión...\n";
+                std::cout << "Generando Reportes\n";
+                graficarSolicitudes(usuario);
+                convertirDotAImagen("solicitudes_usuario.dot","solicitudes_usuario.png");
+                graficarListaCircularPublicaciones(usuario,listaPubli,matrizAmistades);
+                convertirDotAImagen("lista_circular.dot" , "lista_circular.png");
+                graficaListaAmigos(usuario,matrizAmistades);
+                convertirDotAImagen("lista_amigos_usuarios.dot","lista_amigos_usuarios.png");
+
+                break;
+            case 6:
+                std::cout << "Cerrando sesion...\n";
                 break;
             default:
-                std::cout << "Opción no válida.\n";
+                std::cout << "Opción no valida.\n";
                 break;
         }
-    } while (opcion != 5);
+    } while (opcion != 6);
+}
+
+
+void convertirDotAImagen(const std::string& nombreArchivoDot, const std::string& nombreArchivoImagen) {
+    std::string comando = "dot -Tpng " + nombreArchivoDot + " -o " + nombreArchivoImagen;
+    int resultado = system(comando.c_str());
+
+    if (resultado == 0) {
+        std::cout << "Imagen generada exitosamente: " << nombreArchivoImagen << std::endl;
+    } else {
+        std::cerr << "Error al generar la imagen desde el archivo DOT." << std::endl;
+    }
 }
 
     // Ver las solicitudes de amistad recibidas y aceptar o rechazar alguna
@@ -725,7 +957,7 @@ void verSolicitudesAmistad(Usuario* usuario) {
         }
 
         // Crear la solicitud
-        Solicitud* nuevaSolicitud = new Solicitud{emisor, nullptr};
+        Solicitud* nuevaSolicitud = new Solicitud{emisor, correoReceptor};
 
         // Agregar a la lista de solicitudes enviadas del emisor
         nuevaSolicitud->siguiente = emisor->solicitudesEnviadas;

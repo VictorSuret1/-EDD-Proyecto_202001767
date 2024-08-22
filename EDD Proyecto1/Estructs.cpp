@@ -5,8 +5,12 @@
 struct Usuario;  // Declaración adelantada
 
 struct Solicitud {
-    Usuario* emisor;
-    Solicitud* siguiente;
+    Usuario* emisor;            // Usuario que envió la solicitud
+    std::string correoReceptor;  // Correo del usuario que recibió la solicitud
+    Solicitud* siguiente;        // Puntero a la siguiente solicitud en la lista
+
+    Solicitud(Usuario* emisor, const std::string& correoReceptor)
+        : emisor(emisor), correoReceptor(correoReceptor), siguiente(nullptr) {}
 };
 
 struct Usuario {

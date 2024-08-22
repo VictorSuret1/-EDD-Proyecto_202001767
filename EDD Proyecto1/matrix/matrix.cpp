@@ -289,6 +289,8 @@ string Matrix::obtenerNombrePorIndice(int indice) {
     return "";
 }
 
+
+
 Matrix::~Matrix() {
     delete rowHeader;
     delete colHeader;

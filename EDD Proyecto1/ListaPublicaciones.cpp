@@ -40,10 +40,9 @@ Publicacion* cabeza;
 
 
 class ListaCircularPublicaciones {
-private:
-    NodoPublicacion* cabeza;
 
 public:
+    NodoPublicacion* cabeza;
     ListaCircularPublicaciones() : cabeza(nullptr) {}
 
     void insertarPublicacion(Publicacion* pub) {
@@ -89,7 +88,9 @@ public:
         } while (opcion != 'q');
     }
 
-
+     bool estaVacia() const {
+        return cabeza == nullptr;
+    }
    
     
 };

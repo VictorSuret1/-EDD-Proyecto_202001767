@@ -13,12 +13,12 @@ int main() {
     std::string nombres, apellidos, fechaNacimiento, correo, contrasena;
 
     do {
-        std::cout << "\n--- Menú Principal ---\n";
-        std::cout << "1. Iniciar sesión\n";
+        std::cout << "\n--- Menu Principal ---\n";
+        std::cout << "1. Iniciar sesion\n";
         std::cout << "2. Registrarse\n";
-        std::cout << "3. Información\n";
+        std::cout << "3. Informacion\n";
         std::cout << "4. Salir\n";
-        std::cout << "Seleccione una opción: ";
+        std::cout << "Seleccione una opcion: ";
         std::cin >> opcion;
 
         switch (opcion) {
@@ -47,7 +47,7 @@ int main() {
                 break;
 
             case 3:
-                std::cout << "Información de la aplicación...\n";
+                std::cout << "Información de la aplicacion...\n";
                 // Aquí puedes agregar la información que desees mostrar.
                 break;
 
